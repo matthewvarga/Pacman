@@ -1,0 +1,94 @@
+{
+	"tiles": {
+		"map": {
+			"corner_tl": {
+				"pos": [0,0],
+				"size": 16
+			},
+			"corner_tr": {
+				"pos": [17,0],
+				"size": 16
+			},
+			"straight_v": {
+				"pos": [34,0],
+				"size": 16
+			},
+			"end_u": {
+				"pos": [51,0],
+				"size": 16
+			},
+			"end_l": {
+				"pos": [68,0],
+				"size": 16
+			},
+			"merge_l": {
+				"pos": [85,0],
+				"size": 16
+			},
+			"merge_d": {
+				"pos": [102,0],
+				"size": 16
+			},
+			"gate_l": {
+				"pos": [119,0],
+				"size": 16
+			},
+			"gate_r": {
+				"pos": [136,0],
+				"size": 16
+			},
+			"empty": {
+				"pos": [153,0],
+				"size": 16
+			},
+			"spawn": {
+				"pos": [153,0],
+				"size": 16
+			},
+			"corner_bl": {
+				"pos": [0,17],
+				"size": 16
+			},
+			"corner_br": {
+				"pos": [17,17],
+				"size": 16
+			},
+			"straight_h": {
+				"pos": [34,17],
+				"size": 16
+			},
+			"end_d": {
+				"pos": [51,17],
+				"size": 16
+			},
+			"end_r": {
+				"pos": [68,17],
+				"size": 16
+			},
+			"merge_r": {
+				"pos": [85,17],
+				"size": 16
+			},
+			"merge_u": {
+				"pos": [102,17],
+				"size": 16
+			},
+			"gate": {
+				"pos": [119,17],
+				"size": 16
+			},
+			"point_big": {
+				"pos": [136,17],
+				"size": 16
+			},
+			"point_small": {
+				"pos": [153,17],
+				"size": 16
+			}
+		},
+		"player": {
+
+		}
+
+	}
+}
