@@ -1,0 +1,32 @@
+{
+	"level_1": {
+		"player": {
+			"pos": [10,20],
+			"lives": 3,
+			"size": 16,
+			"velocity": 2
+		},
+		"ghosts": {
+			"blue": {
+				"pos": [9, 13],
+				"size": 16,
+				"velocity": 1
+			},
+			"red": {
+				"pos": [9, 12],
+				"size": 16,
+				"velocity": 1
+			},
+			"pink": {
+				"pos": [11, 13],
+				"size": 16,
+				"velocity": 1
+			},
+			"orange": {
+				"pos": [11, 12],
+				"size": 16,
+				"velocity": 1
+			}
+		}
+	}
+}
