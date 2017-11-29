@@ -463,20 +463,16 @@ class Game {
 			this._context.drawImage(this._menu_images[1], MENU_SELECTOR_COORDS[0][0], MENU_SELECTOR_COORDS[0][1]);
 			// begin listening to keys and pass game as param to determine how to interpret key presses
 			handle_key_press(this);
-		}else{
+		}
+		else{
 			// this should not happen, error?
 		}
 	}
 	run() {
 		// draw background
 		draw_map(this._context, this._game_map);
-		// draw player
-		draw_player(this._context, this._player, this._game_map);
-		// draw ghosts
-		for(var i = 0; i < this._ghosts.length; i++){
-			draw_ghost(this._context, this._ghosts[i], this._game_map);
-		}
-		
+		// draw entities
+		draw_entities(this._context, this._player, this._ghosts, this._game_map);		
 	}
 	end() {
 		
@@ -713,36 +709,78 @@ function handle_key_press(game){
 	});
 }
 
-/* Draws the player in their current animation on the canvas
+/* Draws the player and ghosts on the canvas
  * context: Context - the canvas context
- * player: Player - the player being drawn
- * game_map: GameMap - the GameMap containing background tiles
+ * player: Player - the player of the game
+ * ghosts: [Ghost, Ghost, ..] - the Ghosts of the level
+ * game_map: GameMap - the GameMap containing background tile information
  */
-function draw_player(context, player, game_map){
+function draw_entities(context, player, ghosts, game_map){
+	// draw tiles behind player and ghosts
+	draw_background_tiles(context, player, ghosts, game_map);
+	// draw player in their current animation frame
+	draw_player(context, player);
+	// draw ghosts in their current animation frame
+	for(var i = 0; i < ghosts.length; i ++){
+		draw_ghost(context, ghosts[i]);	
+	}
+}
+
+/* Draws the tiles beneath the player and ghosts positions
+ * context: Context - the canvas context
+ * player: Player - the player of the game
+ * ghosts: [Ghost, Ghost, ..] - the Ghosts of the level
+ * game_map: GameMap - the GameMap containing background tile information
+ */
+function draw_background_tiles(context, player, ghosts, game_map){
 
 	// calculate the tile positions the player is above
-	var player_floor_tile = [Math.floor(player.cur_coord[0]/player.size), Math.floor(player.cur_coord[1]/player.size)];
-	var player_ceil_tile = [Math.ceil(player.cur_coord[0]/player.size), Math.ceil(player.cur_coord[1]/player.size)];
-
+	var player_floor_tile_pos = [Math.floor(player.cur_coord[0]/player.size), Math.floor(player.cur_coord[1]/player.size)];
+	var player_ceil_tile_pos = [Math.ceil(player.cur_coord[0]/player.size), Math.ceil(player.cur_coord[1]/player.size)];
 
 	// retrieve the tiles beneath the player
-	var floor_tile = game_map.get_map_tile(player_floor_tile);
-	var ceil_tile = game_map.get_map_tile(player_ceil_tile);
+	var player_floor_tile = game_map.get_map_tile(player_floor_tile_pos);
+	var player_ceil_tile = game_map.get_map_tile(player_ceil_tile_pos);
 
+	// draw tiles the player is above
+	draw_tile(context, player_floor_tile);
+	draw_tile(context, player_ceil_tile);
+
+	// draw tiles behind ghosts
+	for(var i = 0; i < ghosts.length; i++){
+
+		// calculate the tile positions the ghost is above
+		var ghost_floor_tile_pos = [Math.floor(ghosts[i].cur_coord[0]/ghosts[i].size), Math.floor(ghosts[i].cur_coord[1]/ghosts[i].size)];
+		var ghost_ceil_tile_pos = [Math.ceil(ghosts[i].cur_coord[0]/ghosts[i].size), Math.ceil(ghosts[i].cur_coord[1]/ghosts[i].size)];
+
+		// retrieve the tiles beneath the ghost
+		var ghost_floor_tile = game_map.get_map_tile(ghost_floor_tile_pos);
+		var ghost_ceil_tile = game_map.get_map_tile(ghost_ceil_tile_pos);
+
+		// draw tiles the ghost is above
+		draw_tile(context, ghost_floor_tile);
+		draw_tile(context, ghost_ceil_tile);
+	}
+}
+
+/* Draws the player in their current animation frame
+ * context: Context - the canvas context
+ * player: Player - the player of the game
+ */
+function draw_player(context, player){
 	// check if player alive or not
 	var player_state = "dead";
 	if(player.is_alive){
 		player_state = "alive";
 	}
-
 	// array containing current animations sprites
-	var anim_sprites = player.sprites.get(player.cur_dir).get(player_state);
+	var player_anim_sprites = player.sprites.get(player.cur_dir).get(player_state);
 
 	// ready to update animation
 	if(player.anim_frame >= player.anim_timer){
 		player.anim_timer = 0;
 		// check if at last frame
-		if(player.anim_frame == (anim_sprites.length - 1)){
+		if(player.anim_frame == (player_anim_sprites.length - 1)){
 			player.anim_frame = 0;
 		}
 		else{
@@ -753,37 +791,22 @@ function draw_player(context, player, game_map){
 	else{
 		player.anim_timer += 1;
 	}
-
-	// draw tiles the player is above
-	draw_tile(context, floor_tile);
-	draw_tile(context, ceil_tile);
 	// draw player
-	draw_sprite(context, anim_sprites[player.anim_frame], player.cur_coord);
+	draw_sprite(context, player_anim_sprites[player.anim_frame], player.cur_coord);
 }
 
-/* Draws the ghost in its current animation on the canvas
+/* Draws a ghost in its current animation frame
  * context: Context - the canvas context
- * ghost: Ghost - the Ghost being drawn
- * game_map: GameMap - the GameMap containing background tiles
+ * ghost: Ghost - the ghost being drawn
  */
-function draw_ghost(context, ghost, game_map){
-
-	// calculate the tile positions the ghost is above
-	var ghost_floor_tile = [Math.floor(ghost.cur_coord[0]/ghost.size), Math.floor(ghost.cur_coord[1]/ghost.size)];
-	var ghost_ceil_tile = [Math.ceil(ghost.cur_coord[0]/ghost.size), Math.ceil(ghost.cur_coord[1]/ghost.size)];
-
-	// retrieve the tiles beneath the ghost
-	var floor_tile = game_map.get_map_tile(ghost_floor_tile);
-	var ceil_tile = game_map.get_map_tile(ghost_ceil_tile);
-
-	// array containing current animations sprites
-	var anim_sprites = ghost.sprites.get(ghost.cur_dir).get(ghost.state);
-
+function draw_ghost(context, ghost){
+	// array containing current animation sprites
+	var ghost_anim_sprites = ghost.sprites.get(ghost.cur_dir).get(ghost.state);
 	// ready to update animation
 	if(ghost.anim_frame >= ghost.anim_timer){
 		ghost.anim_frame = 0;
 		// check if at last frame
-		if(ghost.anim_frame == (anim_sprites.length-1)){
+		if(ghost.anim_frame == (ghost_anim_sprites.length-1)){
 			ghost.anim_frame = 0;
 		}
 		else{
@@ -794,11 +817,6 @@ function draw_ghost(context, ghost, game_map){
 	else{
 		ghost.anim_timer += 1;
 	}
-
-	// draw tiles the ghost is above
-	draw_tile(context, floor_tile);
-	draw_tile(context, ceil_tile);
 	// draw ghost
-	draw_sprite(context, anim_sprites[ghost.anim_frame], ghost.cur_coord);
+	draw_sprite(context, ghost_anim_sprites[ghost.anim_frame], ghost.cur_coord);
 }
-
