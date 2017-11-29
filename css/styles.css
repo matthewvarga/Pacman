@@ -1,9 +1,13 @@
 body{
 	width:100%;
 	text-align: center;
+	background-color: dimgrey;
 }
 canvas{
 	margin-top:50px;
 	display:inline;
 	background-color: grey;
+	border: solid;
+	border-width: 1px;
+	border-color: grey;
 }
