@@ -257,8 +257,8 @@
 				"lives": 3,
 				"velocity": 1,
 				"size": 16,
-				"int_dir": "right",
-				"cur_dir": "right",
+				"int_dir": "left",
+				"cur_dir": "left",
 				"is_moving": false,
 				"sprites": {
 					"left": {
@@ -278,8 +278,9 @@
 						"dead": [[68,17],[0,85],[17,85],[34,85],[51,85],[68,85],[85,85],[102,85],[119,85],[136,85],[0,85]]
 					}
 				},
-				"anim_frame": 0,
-				"anim_timer": 12,
+				"anim_frame": 1,
+				"anim_timer": 0,
+				"anim_update": 8,
 				"boosted_timer": 200,
 				"hitbox": 14,
 				"score": 0
@@ -322,7 +323,8 @@
 						}
 					},
 					"anim_frame": 0,
-					"anim_timer": 12,
+					"anim_timer": 0,
+					"anim_update": 12,
 					"hitbox": 14
 				},
 				"red": {
@@ -362,7 +364,8 @@
 						}
 					},
 					"anim_frame": 0,
-					"anim_timer": 12,
+					"anim_timer": 0,
+					"anim_update": 12,
 					"hitbox": 14
 				},
 				"pink": {
@@ -402,7 +405,8 @@
 						}
 					},
 					"anim_frame": 0,
-					"anim_timer": 12,
+					"anim_timer": 0,
+					"anim_update": 12,
 					"hitbox": 14
 				},
 				"orange": {
@@ -442,10 +446,17 @@
 						}
 					},
 					"anim_frame": 0,
-					"anim_timer": 12,
+					"anim_timer": 0,
+					"anim_update": 12,
 					"hitbox": 14
 				}
 			}
 		}
+	},
+	"score":
+	{
+		"sprites": [[0,0],[11,0],[22,0],[33,0],[44,0],[55,0],[66,0],[77,0],[88,0],[99,0]],
+		"width": 10,
+		"height": 14
 	}
 }
