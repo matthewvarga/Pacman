@@ -20,7 +20,7 @@ const LIVES_POS = [[440,32],[460,32],[480,32]];
  * boost_timer: int - number of frames the player is boosted for 
  */
 class Player {
-	constructor(is_alive, is_boosted, spawn_coord, cur_coord, lives, velocity, size, int_dir, cur_dir, is_moving, sprites, anim_frame, anim_timer, anim_update, boosted_timer, hitbox, score){
+	constructor(is_alive, is_boosted, spawn_coord, cur_coord, lives, velocity, size, int_dir, cur_dir, is_moving, sprites, anim_frame, anim_timer, anim_update, boosted_timer, boosted_update, hitbox, score, streak){
 		this.is_alive = is_alive;
 		this.is_boosted = is_boosted;
 		this.spawn_coord = spawn_coord;
@@ -36,8 +36,10 @@ class Player {
 		this.anim_timer = anim_timer;
 		this.anim_update = anim_update;
 		this.boosted_timer = boosted_timer;
+		this.boosted_update = boosted_update;
 		this.hitbox = hitbox;
 		this.score = score;
+		this.streak = streak;
 	}
 	get is_alive(){
 		return this._is_alive;
@@ -129,6 +131,12 @@ class Player {
 	set boosted_timer(new_boosted_timer){
 		this._boosted_timer = new_boosted_timer;
 	}
+	get boosted_update(){
+		return this._boosted_update;
+	}
+	set boosted_update(new_boosted_update){
+		this._boosted_update = new_boosted_update;
+	}
 	get hitbox(){
 		return this._hitbox;
 	}
@@ -140,6 +148,12 @@ class Player {
 	}
 	set score(new_score){
 		this._score = new_score;
+	}
+	get streak(){
+		return this._streak;
+	}
+	set streak(new_streak){
+		this._streak = new_streak;
 	}
 
 	draw(context){
@@ -154,8 +168,18 @@ class Player {
 		// ready to update animation
 		if(this._anim_timer >= this._anim_update){
 			this._anim_timer = 0;
+
+			// end of death animation
+			if((player_state == "dead")&&(this._anim_frame == (player_anim_sprites.length - 1))){
+				// set player state to alive and position to spawn
+				this._is_alive = true;
+				this._cur_coord = [160,320]; // fix later so not random number here
+				this._is_moving = true;
+				this._anim_frame = 0;
+			}
+
 			// check if at last frame
-			if(this._anim_frame == (player_anim_sprites.length - 1)){
+			else if(this._anim_frame == (player_anim_sprites.length - 1)){
 				this._anim_frame = 0;
 			}
 			else{
@@ -207,8 +231,7 @@ class Player {
 			lives_sprite.draw(context, LIVES_POS[j]);
 		}
 	}
-
-	update_pos(game_map){
+	update_pos(game_map) {
 		// calculate the tile positions the player is above
 		var player_floor_tile_pos = [Math.floor(this._cur_coord[0]/this._size), Math.floor(this._cur_coord[1]/this._size)];
 		var player_ceil_tile_pos = [Math.ceil(this._cur_coord[0]/this._size), Math.ceil(this._cur_coord[1]/this._size)];
@@ -217,20 +240,8 @@ class Player {
 		var player_floor_tile = game_map.get_map_tile(player_floor_tile_pos);
 		var player_ceil_tile = game_map.get_map_tile(player_ceil_tile_pos);
 
-		//check if at bridge
-		if(this._cur_coord[0] > BRIDGE_RIGHT_POS[0]){
-			this._cur_coord = BRIDGE_LEFT_POS;
-			this._int_dir = "right";
-			this._cur_dir = "right";
-		}
-		else if(this._cur_coord[0] < BRIDGE_LEFT_POS[0]){
-			this._cur_coord = BRIDGE_RIGHT_POS;
-			this._int_dir = "left";
-			this._cur_dir = "left";
-		}
-
 		// check if player is perfectly on a tile
-		else if((player_floor_tile_pos[0] == player_ceil_tile_pos[0]) && (player_floor_tile_pos[1] == player_ceil_tile_pos[1])){
+		if((player_floor_tile_pos[0] == player_ceil_tile_pos[0]) && (player_floor_tile_pos[1] == player_ceil_tile_pos[1])){
 
 			var left_tile = game_map.get_map_tile([player_floor_tile_pos[0]-1, player_floor_tile_pos[1]]);
 			var right_tile = game_map.get_map_tile([player_ceil_tile_pos[0]+1, player_ceil_tile_pos[1]]);

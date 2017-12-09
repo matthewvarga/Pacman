@@ -14,7 +14,7 @@
  * anim_timer: int -numer of frames that pass before animation frame changes
  */
 class Ghost {
-	constructor(colour, state, spawn_coord, cur_coord, velocity, size, int_dir, cur_dir, is_moving, dir_timer, sprites, anim_frame, anim_timer, anim_update, hitbox){
+	constructor(colour, state, spawn_coord, cur_coord, velocity, size, int_dir, cur_dir, is_moving, dir_timer, dir_update, sprites, anim_frame, anim_timer, anim_update, hitbox){
 		this.colour = colour;
 		this.state = state;
 		this.spawn_coord = spawn_coord;
@@ -25,6 +25,7 @@ class Ghost {
 		this.cur_dir = cur_dir;
 		this.is_moving = is_moving;
 		this.dir_timer = dir_timer;
+		this.dir_update = dir_update;
 		this.sprites = sprites;
 		this.anim_frame = anim_frame;
 		this.anim_timer = anim_timer;
@@ -91,6 +92,12 @@ class Ghost {
 	set dir_timer(new_dir_timer){
 		this._dir_timer = new_dir_timer;
 	}
+	get dir_update(){
+		return this._dir_update;
+	}
+	set dir_update(new_dir_update){
+		this._dir_update = new_dir_update;
+	}
 	get sprites(){
 		return this._sprites;
 	}
@@ -129,23 +136,168 @@ class Ghost {
 	draw(context){
 		// array containing current animation sprites
 		var ghost_anim_sprites = this._sprites.get(this._cur_dir).get(this._state);
-		// ready to update animation
+
+		// check if ready to update
 		if(this._anim_timer >= this._anim_update){
+			this._anim_frame += 1;
+			this._anim_timer = 0;
+		}
+		// check if at last frame
+		if(this._anim_frame >= (ghost_anim_sprites.length-1)){
 			this._anim_frame = 0;
-			// check if at last frame
-			if(this._anim_frame == (ghost_anim_sprites.length-1)){
-				this._anim_frame = 0;
-			}
-			else{
-				this._anim_frame += 1;
-			}
 		}
-		// not ready to update animation
-		else{
-			this._anim_timer += 1;
-		}
+		// if not ready, update timer
+		this._anim_timer += 1;
+
 		// draw ghost
 		var anim_sprite = ghost_anim_sprites[this._anim_frame];
 		anim_sprite.draw(context, this._cur_coord);
+	}
+
+	update_pos(game_map){
+		// calculate the tile positions the ghost is above
+		var ghost_floor_tile_pos = [Math.floor(this._cur_coord[0]/this._size), Math.floor(this._cur_coord[1]/this._size)];
+		var ghost_ceil_tile_pos = [Math.ceil(this._cur_coord[0]/this._size), Math.ceil(this._cur_coord[1]/this._size)];
+
+		// retrieve the tiles beneath the ghost
+		var ghost_floor_tile = game_map.get_map_tile(ghost_floor_tile_pos);
+		var ghost_ceil_tile = game_map.get_map_tile(ghost_ceil_tile_pos);
+
+		var directions = ["left", "right", "up", "down"];
+		// check if ghost should change directions
+		if(this._dir_timer >= this._dir_update){
+			this._dir_timer = 0;
+			// select random index ofnew direction
+			var new_rand_dir = Math.floor((Math.random() * directions.length));
+			// set ghosts intended direction to the random one selected
+			this._int_dir = directions[new_rand_dir];
+		}
+		// not ready, increase timer
+		this._dir_timer += 1;
+
+		// check if ghost is perfectly on a tile
+		if((ghost_floor_tile_pos[0] == ghost_ceil_tile_pos[0]) && (ghost_floor_tile_pos[1] == ghost_ceil_tile_pos[1])){
+
+			var left_tile = game_map.get_map_tile([ghost_floor_tile_pos[0]-1, ghost_floor_tile_pos[1]]);
+			var right_tile = game_map.get_map_tile([ghost_ceil_tile_pos[0]+1, ghost_ceil_tile_pos[1]]);
+			var up_tile = game_map.get_map_tile([ghost_floor_tile_pos[0], ghost_floor_tile_pos[1]-1]);
+			var down_tile = game_map.get_map_tile([ghost_ceil_tile_pos[0], ghost_ceil_tile_pos[1]+1]);
+
+			var valid_tiles = ["empty", "point_small", "point_big"];
+
+			// check if leaving spawn
+			if((up_tile.type == "gate")&&(this._is_moving)){
+				this._cur_dir = "up";
+				this._int_dir = "up";
+				this._cur_coord[1] -= this._velocity;
+			}
+
+			else if((up_tile.type == "gate_r")&&(this._is_moving)){
+				this._cur_dir = "left";
+				this._int_dir = "up";
+				this._cur_coord[0] -= this._velocity;
+			}
+
+			else if((up_tile.type == "gate_l")&&(this._is_moving)){
+				this._cur_dir = "right";
+				this._int_dir = "up";
+				this._cur_coord[0] += this._velocity;
+			}
+
+			// check if ghost can move in intended direction
+			else if(((this._int_dir == "left") && (valid_tiles.includes(left_tile.type)))&&(this._is_moving)){
+				this._cur_dir = "left";
+				this._cur_coord[0] -= this._velocity;
+			}
+			else if(((this._int_dir == "right") && (valid_tiles.includes(right_tile.type)))&&(this._is_moving)){
+				this._cur_dir = "right";
+				this._cur_coord[0] += this._velocity;
+			}
+			else if(((this._int_dir == "up") && (valid_tiles.includes(up_tile.type)))&&(this._is_moving)){
+				this._cur_dir = "up";
+				this._cur_coord[1] -= this._velocity;
+			}
+			else if(((this._int_dir == "down") && (valid_tiles.includes(down_tile.type)))&&(this._is_moving)){
+				this._cur_dir = "down";
+				this._cur_coord[1] += this._velocity;
+			}
+			else{
+				// check if ghost can move in current direction, since cant in intended
+				if((this._cur_dir == "left") && (valid_tiles.includes(left_tile.type))){
+					if(this._is_moving){
+						this._cur_coord[0] -= this._velocity;
+					}
+				}
+				else if((this._cur_dir == "right") && (valid_tiles.includes(right_tile.type))){
+					if(this._is_moving){
+						this._cur_coord[0] += this._velocity;
+					}
+				}
+				else if((this._cur_dir == "up") && (valid_tiles.includes(up_tile.type))){
+					if(this._is_moving){
+						this._cur_coord[1] -= this._velocity;
+					}
+				}
+				else if((this._cur_dir == "down") && (valid_tiles.includes(down_tile.type))){
+					if(this._is_moving){
+						this._cur_coord[1] += this._velocity;
+					}
+				}
+				// ghost cant move
+				else{
+					// randomly select new direction to move in
+					var int_dir_index = directions.indexOf(this._int_dir);
+					// remove current intended direction from possible new directions
+					directions.splice(int_dir_index, 1);
+					var cur_dir_index = directions.indexOf(this._cur_dir);
+					// remove current direction from possible new directions, if it's different than inteded directions
+					if(cur_dir_index >= 0){
+						directions.splice(cur_dir_index, 1);
+					}
+					// select random index of remaining directions array
+					var rand_dir = Math.floor((Math.random() * directions.length));
+					// set ghosts intended direction to the random one selected
+					this._int_dir = directions[rand_dir];
+				}
+			}
+		}
+		// ghost NOT perfectly on tile (moving horizontally --> x diff y same)
+		else if((ghost_floor_tile_pos[0] != ghost_ceil_tile_pos[0])&&(ghost_floor_tile_pos[1] == ghost_ceil_tile_pos[1])){
+			if((this._int_dir == "left")&&(this._is_moving)){
+				this._cur_dir = "left";
+				this._cur_coord[0] -= this._velocity;
+			}
+			else if((this._int_dir == "right")&&(this._is_moving)){
+				this._cur_dir = "right";
+				this._cur_coord[0] += this._velocity;
+			}
+			else{
+				if((this._cur_dir == "left")&&(this._is_moving)){
+					this._cur_coord[0] -= this._velocity;
+				}
+				else if((this._cur_dir == "right")&&(this._is_moving)){
+					this._cur_coord[0] += this._velocity;
+				}
+			}
+		}
+		// ghost NOT perfectly on tile (moving veritcally --> y diff x same)
+		else if((ghost_floor_tile_pos[0] == ghost_ceil_tile_pos[0])&&(ghost_floor_tile_pos[1] != ghost_ceil_tile_pos[1])){
+			if((this._int_dir == "up")&&(this._is_moving)){
+				this._cur_dir = "up";
+				this._cur_coord[1] -= this._velocity;
+			}
+			else if((this._int_dir == "down")&&(this._is_moving)){
+				this._cur_dir = "down";
+				this._cur_coord[1] += this._velocity;
+			}
+			else{
+				if((this._cur_dir == "up")&&(this._is_moving)){
+					this._cur_coord[1] -= this._velocity;
+				}
+				else if((this._cur_dir == "down")&&(this._is_moving)){
+					this._cur_coord[1] += this._velocity;
+				}
+			}
+		}
 	}
 }

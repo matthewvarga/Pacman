@@ -8,13 +8,6 @@ const MENU_IMAGE_FILES = ["main_screen.png", "selector.png", "side_bar.png", "re
 // SPRITE CONSTANTS
 const NUM_SPRITE_SHEETS = 4;
 const SPRITE_FILES = ["map_sprites.png", "player_sprites.png", "ghost_sprites.png", "score_sprites.png"];
-
-
-// BRIDGE
-const BRIDGE_RIGHT_POS = [316,209];
-const BRIDGE_LEFT_POS = [6,209];
-
-
 // FUNCTIONS BELOW
 
 
@@ -118,7 +111,7 @@ function setup_from_json(context, sprite_sheets, menu_images){
 				params.push(val);
 			}
 		});
-		let user = new Player(params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], params[12], params[13], params[14], params[15], params[16]);
+		let user = new Player(params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], params[9], params[10], params[11], params[12], params[13], params[14], params[15], params[16], params[17], params[18]);
 		// store all ghosts
 		var ghosts = [];
 		//iterate through ghost default vals from json file and store in ghost_params
@@ -151,7 +144,7 @@ function setup_from_json(context, sprite_sheets, menu_images){
 				}
 			});
 			// create ghost and store in ghosts
-			ghosts.push(new Ghost(ghost_params[0], ghost_params[1], ghost_params[2], ghost_params[3], ghost_params[4], ghost_params[5], ghost_params[6], ghost_params[7], ghost_params[8], ghost_params[9], ghost_params[10], ghost_params[11], ghost_params[12], ghost_params[13]));
+			ghosts.push(new Ghost(ghost_params[0], ghost_params[1], ghost_params[2], ghost_params[3], ghost_params[4], ghost_params[5], ghost_params[6], ghost_params[7], ghost_params[8], ghost_params[9], ghost_params[10], ghost_params[11], ghost_params[12], ghost_params[13], ghost_params[14], ghost_params[15]));
 		});
 
 		// store score number sprites in map "0" -> 0 sprite, "1" -> 1 sprite, etc...

@@ -281,9 +281,11 @@
 				"anim_frame": 1,
 				"anim_timer": 0,
 				"anim_update": 8,
-				"boosted_timer": 200,
+				"boosted_timer": 0,
+				"boosted_update":300,
 				"hitbox": 14,
-				"score": 0
+				"score": 0,
+				"streak": 0
 			},
 			"ghosts": {
 				"blue": {
@@ -295,7 +297,8 @@
 					"int_dir": "up",
 					"cur_dir": "up",
 					"is_moving": false,
-					"dir_timer": 20,				
+					"dir_timer": 0,
+					"dir_update": 200,				
 					"sprites": {
 						"left": {
 							"alive": [[51,34],[34,34]],
@@ -336,7 +339,8 @@
 					"int_dir": "up",
 					"cur_dir": "up",
 					"is_moving": false,
-					"dir_timer": 20,	
+					"dir_timer": 0,
+					"dir_update": 200,		
 					"sprites": {
 						"left": {
 							"alive": [[51,0],[34,0]],
@@ -377,7 +381,8 @@
 					"int_dir": "up",
 					"cur_dir": "up",
 					"is_moving": false,
-					"dir_timer": 20,
+					"dir_timer": 0,
+					"dir_update": 200,	
 					"sprites": {
 						"left": {
 							"alive": [[51,17],[34,17]],
@@ -418,7 +423,8 @@
 					"int_dir": "up",
 					"cur_dir": "up",
 					"is_moving": false,
-					"dir_timer": 20,
+					"dir_timer": 0,
+					"dir_update": 200,	
 					"sprites": {
 						"left": {
 							"alive": [[51,51],[34,51]],
